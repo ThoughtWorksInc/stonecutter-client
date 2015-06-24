@@ -1,0 +1,46 @@
+$white: #fff;
+$black: #000;
+
+
+
+
+$green_light: #78b82a;
+$green_dark: #006241;
+$grey_medium: #777;
+$grey_dark: #333;
+$orange: #f0942b;
+
+$default_text_color: $grey_dark;
+
+$background_color: $white;
+
+$error_color: $orange;
+
+$link_colour: $default_text_color;
+$link_hover_colour: $link_colour;
+$link_visited_colour: $link_colour;
+$link_active_colour: $link_colour;
+
+//
+
+$small_device: 320px;
+$smallish_device: 480px;
+$medium_device: 640px;
+$large_device: 768px;
+$extra_large_device: 960px;
+$monster_large_device: 1220px;
+
+//
+
+$grid_gutter: 15px;
+$default_margin: 30px;
+
+//
+
+$max_site_width: $medium_device;
+$main_nav_height: 50px;
+
+//
+
+$heading_title_font_family: 'Roboto Condensed', sans-serif;
+$para_font_family: 'Roboto Condensed', sans-serif;

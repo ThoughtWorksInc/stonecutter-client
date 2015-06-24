@@ -1,0 +1,37 @@
+extends layout/layout
+
+block vars
+  - bodyClass = ""
+  - pageTitle = "Routes"
+
+block headerScripts
+  style.
+    .demo {
+      padding-top: 40px;
+    }
+    .demo-nav {
+      list-style: none;
+    }
+    .demo-item {
+      margin: 0 0 20px 0;
+    }
+    .demo-item a {
+      color: #007E84;
+      font-size: 20px;
+      text-decoration: none;
+    }
+    .demo-item a:hover {
+      text-decoration: underline;
+    }
+
+
+
+
+block content
+
+  .demo
+    .middle-container
+      nav.demo-nav
+        li.demo-item: a(href="library") Library
+        li.demo-item: a(href="./") Start page
+        li.demo-item: a(href="./poll") Poll page
