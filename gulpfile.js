@@ -159,7 +159,7 @@ gulp.task('build', function (callback) {
 });
 
 gulp.task('ghpages', function() {
-  return gulp.src('./resources/public/**/*')
+  return gulp.src('./public/**/*')
       .pipe(ghPages({cacheDir:deployed_path}));
 });
 
