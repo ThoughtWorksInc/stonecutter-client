@@ -1,0 +1,19 @@
+extends layout/layout
+
+block vars
+  - bodyClass = ""
+  - pageTitle = "Poll: Soho requires safer cycle lanes?"
+
+block content
+  .middle-container
+    .poll-box
+      h1.poll__question_intro Soho requires safer cycle lanes
+      .poll-box__result
+      ul.poll-legend
+        li.poll-legend__item
+          span.poll-legend__color(style="background-color:#7ED321")
+          span.poll-legend__label Yes
+        li.poll-legend__item
+          span.poll-legend__color(style="background-color:#006241")
+          span.poll-legend__label No
+

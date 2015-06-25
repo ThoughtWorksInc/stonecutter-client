@@ -1,3 +1,6 @@
+html, body {
+  min-height: 100%;
+}
 .middle-container {
   max-width: $medium_device;
   padding: 0 1rem;

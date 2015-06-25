@@ -5,4 +5,38 @@
     margin-left: 5px;
     margin-right: 5px;
   }
+
+  &__result {
+    @include size(250px);
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    background: image-url('poll-result.svg') no-repeat 50% 50%;
+    background-size: contain;
+  }
+}
+
+
+.poll-legend {
+  $item_size: 30px;
+  @include reset-list;
+  display: inline-block;
+  &__item {
+    display: inline-block;
+    margin-right: 20px;
+    text-align: left;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+  &__color {
+    display: inline-block;
+    @include size($item_size);
+    float: left;
+  }
+  &__label {
+    display: block;
+    line-height: $item_size;
+    margin-left: $item_size + 10;
+  }
 }

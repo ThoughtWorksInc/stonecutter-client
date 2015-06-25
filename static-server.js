@@ -6,7 +6,8 @@ app.set('port', (process.env.PORT || 7171));
 var pageData = {
   "javascriptsBase": "/assets/javascripts",
   "stylesheetsBase": "/assets/stylesheets",
-  "imagesBase": "/assets/images"
+  "imagesBase": "/assets/images",
+  "oAuthURL": "http://localhost:7777"
 };
 
 app.use('/assets', express.static(__dirname + '/public'));
@@ -25,6 +26,9 @@ app.all('*', beforeAllFilter);
 app.get('/', function(req, res){
   res.render('index', pageData);
 });
+app.get('/greenparty', function(req, res){
+  res.render('greenparty', pageData);
+});
 
 app.get('/poll', function(req, res){
   res.render('poll', pageData);
@@ -32,6 +36,14 @@ app.get('/poll', function(req, res){
 
 app.get('/view-poll', function(req, res){
   res.render('view-poll', pageData);
+});
+
+app.get('/authorise-fail', function(req, res){
+  res.render('authorise-fail', pageData);
+});
+
+app.get('/authorise-success', function(req, res){
+  res.render('authorise-success', pageData);
 });
 
 app.get('/library', function(req, res){

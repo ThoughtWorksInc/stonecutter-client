@@ -1,0 +1,21 @@
+extends layout/layout
+
+block vars
+  - bodyClass = ""
+  - pageTitle = "Home"
+
+block headerScripts
+
+block content
+  .middle-container
+    h1 Failed to sign in
+    p
+      | Please ensure that you
+      = " "
+      span.highlight--green allow access to your profile card
+      = " "
+      | with your sign in provider.
+
+    a.button(href="#{oAuthURL}/sign-in") Try again
+
+

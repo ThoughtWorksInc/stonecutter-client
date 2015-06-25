@@ -1,0 +1,14 @@
+extends layout/layout
+
+block vars
+  - bodyClass = ""
+  - pageTitle = "Home"
+
+block headerScripts
+  meta(http-equiv="refresh" content="3;URL=./poll")
+
+block content
+  .middle-container
+    .loading
+      i.fa.fa-cog.fa-spin.loading__icon
+      .loading__title Almost there...
