@@ -7,6 +7,7 @@
             [scenic.routes :refer [scenic-handler]]
             [stonecutter-client.routes :refer [routes path]]
             [stonecutter-client.logging :as log-config]
+            [stonecutter-client.view.home :as home]
             [clojure.tools.logging :as log]))
 
 (defn html-response [s]
@@ -15,7 +16,7 @@
       (r/content-type "text/html")))
 
 (defn home [request]
- (html-response "Hello World!"))
+ (html-response (home/home-page request)))
 
 (defn not-found [request]
   (html-response "404 PAGE NOT FOUND"))
