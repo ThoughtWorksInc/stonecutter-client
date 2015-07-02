@@ -16,6 +16,7 @@
       (r/content-type "text/html")))
 
 (defn home [request]
+  (prn "REQUEST SESSION " (:session request))
  (html-response (home/home-page request)))
 
 (defn not-found [request]
