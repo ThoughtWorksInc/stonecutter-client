@@ -15,7 +15,7 @@ var gulp = require('gulp'),
     ghPages = require('gulp-gh-pages');
 
 var isDev = false;
-var output_path = 'public';
+var output_path = 'resources/public';
 var deployed_path = 'deployed';
 var dev_path = {
   sass: ['assets/stylesheets/*.scss', '!assets/stylesheets/_*.scss'],
@@ -112,15 +112,6 @@ gulp.task('browser-sync', ['nodemon'], function () {
   })
 });
 
-gulp.task('url', function () {
-  var options = {
-    url: 'http://localhost:' + dev_path.port + '/',
-    app: 'safari'
-  };
-  gulp.src('./public/index.html') // An actual file must be specified or gulp will overlook the task.
-      .pipe(open('<%file.path%>', options));
-});
-
 gulp.task('clean-build', function () {
   return gulp.src([output_path], {read: false})
       .pipe(clean({force: true}));
@@ -159,7 +150,7 @@ gulp.task('build', function (callback) {
 });
 
 gulp.task('ghpages', function() {
-  return gulp.src('./public/**/*')
+  return gulp.src(output_path + '/**/*')
       .pipe(ghPages({cacheDir:deployed_path}));
 });
 

@@ -10,7 +10,7 @@ var pageData = {
   "oAuthURL": "http://localhost:7777"
 };
 
-app.use('/assets', express.static(__dirname + '/public'));
+app.use('/assets', express.static(__dirname + '/resources/public'));
 
 app.set('view engine', 'jade');
 app.set('views', './assets/jade');
