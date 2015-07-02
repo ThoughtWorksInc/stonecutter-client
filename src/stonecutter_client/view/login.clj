@@ -1,4 +1,4 @@
-(ns stonecutter-client.view.home
+(ns stonecutter-client.view.login
   (:require [net.cgrand.enlive-html :as html]
             [stonecutter-client.config :as config]
             [stonecutter-client.view.view-helpers :as vh]))
@@ -13,10 +13,10 @@
   (html/at enlive-m 
            [:.clj-home-link-to-auth] (html/set-attr :href (str oauth-path "?client-id=" client-id "&response_type=code&redirect_uri=" callback-uri))))
 
-(defn home-page [request]
+(defn login-page [request]
   (->> (vh/load-template "public/index.html")
-  	   (set-auth-link)
-       html/emit*
+        vh/add-anti-forgery
+        html/emit*
        (apply str)))
 
 

@@ -1,1 +1,6 @@
-GET     /            home
+GET     /	     	home
+GET 	/voting      	voting
+GET     /login       	show-login-form
+POST    /login       	login
+GET     /callback    	oauth-callback
+

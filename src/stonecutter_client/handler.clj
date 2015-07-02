@@ -7,7 +7,8 @@
             [scenic.routes :refer [scenic-handler]]
             [stonecutter-client.routes :refer [routes path]]
             [stonecutter-client.logging :as log-config]
-            [stonecutter-client.view.home :as home]
+            [stonecutter-client.view.login :as login]
+            [stonecutter-client.config :as config]
             [clojure.tools.logging :as log]))
 
 (defn html-response [s]
@@ -16,14 +17,43 @@
       (r/content-type "text/html")))
 
 (defn home [request]
-  (prn "REQUEST SESSION " (:session request))
- (html-response (home/home-page request)))
+  (r/redirect (path :login)))
+
+(defn show-login-form [request]
+  (html-response (login/login-page request)))
+
+(def client-id (:client-id config/environment))
+
+(def callback-uri "http://localhost:3001/callback")
+
+(def oauth-path (str (:scauth-path config/environment) "/authorisation"))
+(def sauth-path (str (:scauth-path config/environment) "/authorisation?client_id=" client-id "&response_type=code&redirect_uri=" callback-uri ))
+
+
+(defn login [request]
+  ; (prn "IN LOGIN HANDLER" request)
+  ; (prn "CLIENT" client-id)
+  ; (prn "URI" callback-uri)
+  (let [response
+        (-> (r/redirect sauth-path)
+            (assoc :params {:client_id client-id :response_type "code" :redirect_uri callback-uri})
+            (assoc-in [:headers "accept"] "text/html"))]
+    ; (prn "RETURNING" response)
+    response))
+
+(defn oauth-callback [request]
+  (html-response "in call back")
+  )
 
 (defn not-found [request]
   (html-response "404 PAGE NOT FOUND"))
 
 (def handlers
-  {:home          home})
+  {:home                 home
+   :show-login-form      show-login-form
+   :login                login
+   :oauth-callback       oauth-callback
+   })
 
 (def app-handler
   (scenic-handler routes handlers not-found))
