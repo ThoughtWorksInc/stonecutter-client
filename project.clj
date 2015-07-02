@@ -11,6 +11,7 @@
                  [enlive "1.1.5"]
                  [hiccup "1.0.5"]
                  [clj-yaml "0.4.0"]
+                 [clj-http "1.1.2"]
                  [environ "1.0.0"]
                  [org.clojure/tools.logging "0.3.1"]
                  [clj-logging-config "1.9.12"]]

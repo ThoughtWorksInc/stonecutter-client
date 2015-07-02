@@ -8,7 +8,9 @@
             [stonecutter-client.routes :refer [routes path]]
             [stonecutter-client.logging :as log-config]
             [stonecutter-client.view.login :as login]
+            [stonecutter-client.view.voting :as voting]
             [stonecutter-client.config :as config]
+            [clj-http.client :as http]
             [clojure.tools.logging :as log]))
 
 (defn html-response [s]
@@ -24,26 +26,37 @@
 
 (def client-id (:client-id config/environment))
 
+(def client-secret (:client-secret config/environment))
+
 (def callback-uri "http://localhost:3001/callback")
 
-(def oauth-path (str (:scauth-path config/environment) "/authorisation"))
-(def sauth-path (str (:scauth-path config/environment) "/authorisation?client_id=" client-id "&response_type=code&redirect_uri=" callback-uri ))
+(def oauth-path (:scauth-path config/environment))
 
+(def oauth-authorisation-path (str (:scauth-path config/environment) "/authorisation?client_id=" client-id "&response_type=code&redirect_uri=" callback-uri ))
+
+(def oauth-token-path (str (:scauth-path config/environment) "/token"))
 
 (defn login [request]
   ; (prn "IN LOGIN HANDLER" request)
   ; (prn "CLIENT" client-id)
   ; (prn "URI" callback-uri)
   (let [response
-        (-> (r/redirect sauth-path)
+        (-> (r/redirect oauth-authorisation-path)
             (assoc :params {:client_id client-id :response_type "code" :redirect_uri callback-uri})
             (assoc-in [:headers "accept"] "text/html"))]
     ; (prn "RETURNING" response)
     response))
 
 (defn oauth-callback [request]
-  (html-response "in call back")
-  )
+  (let [auth-code (get-in request [:params :code])]
+    (http/get oauth-token-path {:query-params {:grant_type   "authorization_code"
+                                               :redirect_uri callback-uri
+                                               :code         auth-code
+                                               :client_id     client-id
+                                               :client_secret client-secret}})))
+
+(defn voting [request]
+ (html-response (voting/voting-page request)))
 
 (defn not-found [request]
   (html-response "404 PAGE NOT FOUND"))
@@ -53,6 +66,7 @@
    :show-login-form      show-login-form
    :login                login
    :oauth-callback       oauth-callback
+   :voting               voting
    })
 
 (def app-handler
