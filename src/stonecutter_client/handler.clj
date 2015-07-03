@@ -19,7 +19,7 @@
 
 (def client-secret (:client-secret config/environment))
 
-(def callback-uri "http://localhost:3001/callback")
+(def callback-uri (:callback-uri config/environment))
 
 (def oauth-path (:scauth-path config/environment))
 

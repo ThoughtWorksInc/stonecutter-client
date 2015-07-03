@@ -21,6 +21,7 @@
 
 (def environment
    {:scauth-path (get-var "SCAUTH_PATH" "http://localhost:3000")
+    :callback-uri (get-var "CALLBACK_URI" "http://localhost:4000/callback")
     :client-id  (get-var "CLIENT_ID")
     :client-secret  (get-var "CLIENT_SECRET")})
 

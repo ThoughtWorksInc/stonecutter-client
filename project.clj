@@ -24,6 +24,6 @@
                    :plugins        [[lein-ring "0.9.6"]
                                     [lein-midje "3.1.3"]]
                    :ring {:handler stonecutter-client.handler/app
-                          :port 3001
+                          :port 4000
                           :stacktrace-middleware prone.middleware/wrap-exceptions}
                    :resource-paths ["resources"]}})
