@@ -1,6 +1,6 @@
 (defproject stonecutter-client "0.1.0-SNAPSHOT"
   :description "A client app to test stonecutter with."
-  :url "http://example.com/FIXME"
+  :url "https://stonecutter-client.herokuapp.com"
   :min-lein-version "2.0.0"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
