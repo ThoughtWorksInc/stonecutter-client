@@ -9,21 +9,11 @@
             [stonecutter-client.logging :as log-config]
             [stonecutter-client.view.login :as login]
             [stonecutter-client.view.voting :as voting]
+            [stonecutter-client.view.view-poll :as view-poll]
             [stonecutter-client.config :as config]
             [cheshire.core :as json]
             [clj-http.client :as http]
             [clojure.tools.logging :as log]))
-
-(defn html-response [s]
-  (-> s
-      r/response
-      (r/content-type "text/html")))
-
-(defn home [request]
-  (r/redirect (path :login)))
-
-(defn show-login-form [request]
-  (html-response (login/login-page request)))
 
 (def client-id (:client-id config/environment))
 
@@ -37,15 +27,27 @@
 
 (def oauth-token-path (str (:scauth-path config/environment) "/token"))
 
+(defn html-response [s]
+  (-> s
+      r/response
+      (r/content-type "text/html")))
+
+(defn logged-in? [request]
+  (get-in request [:session :access-token]))
+
+(defn home [request]
+  (r/redirect (path :login)))
+
+(defn show-login-form [request]
+  (if (logged-in? request)
+    (r/redirect (path :voting))
+    (html-response (login/login-page request))))
+
 (defn login [request]
-  ; (prn "IN LOGIN HANDLER" request)
-  ; (prn "CLIENT" client-id)
-  ; (prn "URI" callback-uri)
   (let [response
         (-> (r/redirect oauth-authorisation-path)
             (assoc :params {:client_id client-id :response_type "code" :redirect_uri callback-uri})
             (assoc-in [:headers "accept"] "text/html"))]
-    ; (prn "RETURNING" response)
     response))
 
 (defn oauth-callback [request]
@@ -62,9 +64,12 @@
                                            :access_token)}))))
 
 (defn voting [request]
-  (if (get-in request [:session :access-token])
-  (html-response (voting/voting-page request))
+  (if (logged-in? request)
+    (html-response (voting/voting-page request))
     (r/redirect (path :login))))
+
+(defn show-poll-result [request]
+  (html-response (view-poll/result-page request)))
 
 (defn not-found [request]
   (html-response "404 PAGE NOT FOUND"))
@@ -75,6 +80,7 @@
    :login                login
    :oauth-callback       oauth-callback
    :voting               voting
+   :show-poll-result     show-poll-result
    })
 
 (def app-handler

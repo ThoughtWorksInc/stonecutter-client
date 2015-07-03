@@ -3,4 +3,4 @@ GET 	/voting      	voting
 GET     /login       	show-login-form
 POST    /login       	login
 GET     /callback    	oauth-callback
-
+GET     /view-poll      show-poll-result
