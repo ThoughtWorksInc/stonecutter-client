@@ -20,7 +20,7 @@
                      default))))
 
 (def environment
-   {:scauth-path (get-var "SCAUTH_PATH" "http://stonecutter.herokuapp.com")
-    :client-id  (get-var "CLIENT_ID" "2VMA422KLEZJXRJZTR5A7BKKHSZ63PGM")
-    :client-secret  (get-var "CLIENT_SECRET" "WGTJ6GMDZ52JG5ATOCA6G7PWZBEWPGYT")})
+   {:scauth-path (get-var "SCAUTH_PATH" "http://localhost:3000")
+    :client-id  (get-var "CLIENT_ID")
+    :client-secret  (get-var "CLIENT_SECRET")})
 
