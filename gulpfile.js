@@ -9,7 +9,7 @@ var gulp = require('gulp'),
     imagemin = require('gulp-imagemin'),
     browsersync = require('browser-sync'),
     open = require("gulp-open"),
-    clean = require('gulp-clean'),
+    del = require('del'),
     runSequence = require('run-sequence'),
     nodemon = require('gulp-nodemon'),
     ghPages = require('gulp-gh-pages');
@@ -81,14 +81,14 @@ gulp.task('js', function () {
 
 gulp.task('images', function () {
   return gulp.src(dev_path.images)
-      //.pipe(imagemin({optimizationLevel: 3}))
+      .pipe(imagemin({progressive: true}))
       .pipe(gulp.dest(build_path.images))
       .pipe(browsersync.reload({stream: true}));
 });
 
 gulp.task('favicons', function () {
   return gulp.src(dev_path.favicons)
-      .pipe(imagemin({optimizationLevel: 3}))
+      .pipe(imagemin({progressive: true}))
       .pipe(gulp.dest(build_path.html))
       .pipe(browsersync.reload({stream: true}));
 });
@@ -112,13 +112,11 @@ gulp.task('browser-sync', ['nodemon'], function () {
   })
 });
 
-gulp.task('clean-build', function () {
-  return gulp.src([output_path], {read: false})
-      .pipe(clean({force: true}));
+gulp.task('clean-build', function (cb) {
+  del([output_path], cb);
 });
-gulp.task('clean-deployed', function () {
-  return gulp.src([deployed_path], {read: false})
-      .pipe(clean({force: true}));
+gulp.task('clean-deployed', function (cb) {
+  del([deployed_path], cb);
 });
 
 gulp.task('watch', function () {
