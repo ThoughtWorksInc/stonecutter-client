@@ -33,7 +33,8 @@
       (r/content-type "text/html")))
 
 (defn logged-in? [request]
-  (get-in request [:session :access-token]))
+  (and (get-in request [:session :user])
+       (get-in request [:session :access-token])))
 
 (defn home [request]
   (r/redirect (path :login)))
@@ -56,12 +57,13 @@
                                                                   :redirect_uri callback-uri
                                                                   :code         auth-code
                                                                   :client_id     client-id
-                                                                  :client_secret client-secret}})]
+                                                                  :client_secret client-secret}})
+        token-body (-> token-response
+                       :body
+                       (json/parse-string keyword))]
     (-> (r/redirect (path :voting))
-        (assoc :session {:access-token (-> token-response
-                                           :body
-                                           (json/parse-string keyword)
-                                           :access_token)}))))
+        (assoc :session {:access-token (:access_token token-body)
+                         :user (:user-email token-body)}))))
 
 (defn voting [request]
   (if (logged-in? request)
