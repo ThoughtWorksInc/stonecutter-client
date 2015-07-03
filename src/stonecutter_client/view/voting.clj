@@ -10,7 +10,7 @@
 
 (defn voting-page [request]
   (->> (vh/load-template "public/poll.html")
-       #_(set-user-name request)
+       (set-user-name request)
         html/emit*
        (apply str)))
 
