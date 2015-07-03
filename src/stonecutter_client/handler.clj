@@ -10,6 +10,7 @@
             [stonecutter-client.view.login :as login]
             [stonecutter-client.view.voting :as voting]
             [stonecutter-client.config :as config]
+            [cheshire.core :as json]
             [clj-http.client :as http]
             [clojure.tools.logging :as log]))
 
@@ -48,15 +49,22 @@
     response))
 
 (defn oauth-callback [request]
-  (let [auth-code (get-in request [:params :code])]
-    (http/get oauth-token-path {:query-params {:grant_type   "authorization_code"
-                                               :redirect_uri callback-uri
-                                               :code         auth-code
-                                               :client_id     client-id
-                                               :client_secret client-secret}})))
+  (let [auth-code (get-in request [:params :code])
+        token-response (http/get oauth-token-path {:query-params {:grant_type   "authorization_code"
+                                                                  :redirect_uri callback-uri
+                                                                  :code         auth-code
+                                                                  :client_id     client-id
+                                                                  :client_secret client-secret}})]
+    (-> (r/redirect (path :voting))
+        (assoc :session {:access-token (-> token-response
+                                           :body
+                                           (json/parse-string keyword)
+                                           :access_token)}))))
 
 (defn voting [request]
- (html-response (voting/voting-page request)))
+  (if (get-in request [:session :access-token])
+  (html-response (voting/voting-page request))
+    (r/redirect (path :login))))
 
 (defn not-found [request]
   (html-response "404 PAGE NOT FOUND"))
