@@ -30,6 +30,9 @@
 
 (defn auth-url [] (get-env :auth-url "http://localhost:3000"))
 
+(defn absolute-path [resource]
+  (str (base-url) (absolute-path resource)))
+
 (defn html-response [s]
   (-> s
       r/response
@@ -40,11 +43,11 @@
        (get-in request [:session :access-token])))
 
 (defn home [request]
-  (r/redirect (path :login)))
+  (r/redirect (absolute-path :login)))
 
 (defn show-login-form [request]
   (if (logged-in? request)
-    (r/redirect (path :voting))
+    (r/redirect (absolute-path :voting))
     (html-response (login/login-page request))))
 
 (defn login [request]
@@ -71,14 +74,14 @@
         token-body (-> token-response
                        :body
                        (json/parse-string keyword))]
-    (-> (r/redirect (path :voting))
+    (-> (r/redirect (absolute-path :voting))
         (assoc :session {:access-token (:access_token token-body)
                          :user (:user-email token-body)}))))
 
 (defn voting [request]
   (if (logged-in? request)
     (html-response (voting/voting-page request))
-    (r/redirect (path :login))))
+    (r/redirect (absolute-path :login))))
 
 (defn show-poll-result [request]
   (html-response (view-poll/result-page request)))
