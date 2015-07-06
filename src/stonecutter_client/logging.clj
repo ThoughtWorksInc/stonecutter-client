@@ -4,8 +4,7 @@
 
 (defn init-logger! []
   (c/set-loggers!
-    ["sandwich"]
+    ["stonecutter-client"]
     {:name    "logger"
-     :out     (org.apache.log4j.ConsoleAppender.)
      :level   :debug
      :pattern "%d{yyyy-MM-dd HH:mm:ss} %-5p %c:%L - %m%n"}))

@@ -5,27 +5,28 @@
             [bidi.bidi :refer [path-for]]
             [environ.core :refer [env]]
             [scenic.routes :refer [scenic-handler]]
-            [stonecutter-client.routes :refer [routes path]]
-            [stonecutter-client.logging :as log-config]
-            [stonecutter-client.view.login :as login]
-            [stonecutter-client.view.voting :as voting]
-            [stonecutter-client.view.view-poll :as view-poll]
-            [stonecutter-client.config :as config]
             [cheshire.core :as json]
             [clj-http.client :as http]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [stonecutter-client.logging :as log-config]
+            [stonecutter-client.routes :refer [routes path]]
+            [stonecutter-client.view.login :as login]
+            [stonecutter-client.view.voting :as voting]
+            [stonecutter-client.view.view-poll :as view-poll]))
 
-(def client-id (:client-id config/environment))
+(def client-id (env :client-id))
 
-(def client-secret (:client-secret config/environment))
+(def client-secret (env :client-secret))
 
-(def callback-uri (:callback-uri config/environment))
+(def base-url (get env :base-url "http://localhost:4000"))
 
-(def oauth-path (:scauth-path config/environment))
+(def callback-uri (str base-url "/callback"))
 
-(def oauth-authorisation-path (str (:scauth-path config/environment) "/authorisation?client_id=" client-id "&response_type=code&redirect_uri=" callback-uri ))
+(def auth-url (get env :auth-url "http://localhost:3000"))
 
-(def oauth-token-path (str (:scauth-path config/environment) "/api/token"))
+(def oauth-authorisation-path (str auth-url "/authorisation?client_id=" client-id "&response_type=code&redirect_uri=" callback-uri))
+
+(def oauth-token-path (str auth-url "/api/token"))
 
 (defn html-response [s]
   (-> s
@@ -82,8 +83,7 @@
    :login                login
    :oauth-callback       oauth-callback
    :voting               voting
-   :show-poll-result     show-poll-result
-   })
+   :show-poll-result     show-poll-result})
 
 (def app-handler
   (scenic-handler routes handlers not-found))
@@ -110,3 +110,7 @@
   (log-config/init-logger!)
   (-> app wrap-error-handling (run-jetty {:port port})))
 
+(defn lein-ring-init
+  "Called once when running lein ring server"
+  []
+  (log-config/init-logger!))
