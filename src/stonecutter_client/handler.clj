@@ -31,7 +31,7 @@
 (defn auth-url [] (get-env :auth-url "http://localhost:3000"))
 
 (defn absolute-path [resource]
-  (str (base-url) (absolute-path resource)))
+  (str (base-url) (path resource)))
 
 (defn html-response [s]
   (-> s
