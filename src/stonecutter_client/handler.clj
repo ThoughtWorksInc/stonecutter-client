@@ -14,19 +14,21 @@
             [stonecutter-client.view.voting :as voting]
             [stonecutter-client.view.view-poll :as view-poll]))
 
-(def client-id (env :client-id))
+(defn get-env
+  ([k]
+   (get-env k nil))
+  ([k default]
+   (if-let [value (env k)]
+     value
+     (do
+       (if default
+         (log/info (str "Using default environment variable for: " k))
+         (log/warn (str "Missing environment variable for: " k)))
+       default))))
 
-(def client-secret (env :client-secret))
+(defn base-url [] (get-env :base-url "http://localhost:4000"))
 
-(def base-url (get env :base-url "http://localhost:4000"))
-
-(def callback-uri (str base-url "/callback"))
-
-(def auth-url (get env :auth-url "http://localhost:3000"))
-
-(def oauth-authorisation-path (str auth-url "/authorisation?client_id=" client-id "&response_type=code&redirect_uri=" callback-uri))
-
-(def oauth-token-path (str auth-url "/api/token"))
+(defn auth-url [] (get-env :auth-url "http://localhost:3000"))
 
 (defn html-response [s]
   (-> s
@@ -46,17 +48,24 @@
     (html-response (login/login-page request))))
 
 (defn login [request]
-  (let [response
+  (let [client-id (get-env :client-id)
+        callback-uri (str (base-url) "/callback")
+        oauth-authorisation-path (str (auth-url) "/authorisation?client_id=" client-id "&response_type=code&redirect_uri=" callback-uri)
+        response
         (-> (r/redirect oauth-authorisation-path)
             (assoc :params {:client_id client-id :response_type "code" :redirect_uri callback-uri})
             (assoc-in [:headers "accept"] "text/html"))]
     response))
 
 (defn oauth-callback [request]
-  (let [auth-code (get-in request [:params :code])
-        token-response (http/post oauth-token-path {:form-params {:grant_type   "authorization_code"
-                                                                  :redirect_uri callback-uri
-                                                                  :code         auth-code
+  (let [client-id (get-env :client-id)
+        client-secret (get-env :client-secret)
+        callback-uri (str (base-url) "/callback")
+        oauth-token-path (str (auth-url) "/api/token")
+        auth-code (get-in request [:params :code])
+        token-response (http/post oauth-token-path {:form-params {:grant_type    "authorization_code"
+                                                                  :redirect_uri  callback-uri
+                                                                  :code          auth-code
                                                                   :client_id     client-id
                                                                   :client_secret client-secret}})
         token-body (-> token-response
@@ -100,15 +109,13 @@
   (-> site-defaults
       (assoc-in [:session :cookie-attrs :max-age] 3600)))
 
-(def app 
-  (-> app-handler 
+(def app
+  (-> app-handler
       (wrap-defaults wrap-defaults-config)))
-
-(def port (Integer. (get env :port "4000")))
 
 (defn -main [& args]
   (log-config/init-logger!)
-  (-> app wrap-error-handling (run-jetty {:port port})))
+  (-> app wrap-error-handling (run-jetty {:port (Integer. (get-env :port "4000"))})))
 
 (defn lein-ring-init
   "Called once when running lein ring server"
