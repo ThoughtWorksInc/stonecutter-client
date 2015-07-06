@@ -1,4 +1,7 @@
 # stonecutter-client
+
+[![Build Status](https://snap-ci.com/ThoughtWorksInc/stonecutter-client/branch/master/build_image)](https://snap-ci.com/ThoughtWorksInc/stonecutter-client/branch/master)
+
 Stub app for the stonecutter oath application
 
 ## Prerequisites
