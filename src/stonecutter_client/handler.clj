@@ -25,7 +25,7 @@
 
 (def oauth-authorisation-path (str (:scauth-path config/environment) "/authorisation?client_id=" client-id "&response_type=code&redirect_uri=" callback-uri ))
 
-(def oauth-token-path (str (:scauth-path config/environment) "/token"))
+(def oauth-token-path (str (:scauth-path config/environment) "/api/token"))
 
 (defn html-response [s]
   (-> s
@@ -53,7 +53,7 @@
 
 (defn oauth-callback [request]
   (let [auth-code (get-in request [:params :code])
-        token-response (http/get oauth-token-path {:query-params {:grant_type   "authorization_code"
+        token-response (http/post oauth-token-path {:form-params {:grant_type   "authorization_code"
                                                                   :redirect_uri callback-uri
                                                                   :code         auth-code
                                                                   :client_id     client-id
