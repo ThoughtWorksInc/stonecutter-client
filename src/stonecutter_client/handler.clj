@@ -60,6 +60,10 @@
             (assoc-in [:headers "accept"] "text/html"))]
     response))
 
+(defn logout [request]
+  (-> (r/redirect (absolute-path :home))
+      (assoc :session nil)))
+
 (defn oauth-callback [request]
   (let [client-id (get-env :client-id)
         client-secret (get-env :client-secret)
@@ -93,6 +97,7 @@
   {:home                 home
    :show-login-form      show-login-form
    :login                login
+   :logout               logout
    :oauth-callback       oauth-callback
    :voting               voting
    :show-poll-result     show-poll-result})

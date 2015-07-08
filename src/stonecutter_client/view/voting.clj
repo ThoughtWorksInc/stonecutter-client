@@ -5,13 +5,12 @@
 
 (defn set-user-name [request enlive-m]
   (let [user-email (get-in request [:session :user])]
-  (html/at enlive-m 
-           [:.clj-user] (html/content user-email))))
+    (html/at enlive-m
+             [:.clj-user] (html/content user-email)
+             [:.clj-logout] (html/html-content "<a href=/logout>logout</a>"))))
 
 (defn voting-page [request]
   (->> (vh/load-template "public/poll.html")
        (set-user-name request)
-        html/emit*
+       html/emit*
        (apply str)))
-
-
