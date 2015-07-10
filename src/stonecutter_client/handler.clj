@@ -65,11 +65,11 @@
       (assoc :session nil)))
 
 (defn oauth-callback [request]
+  (if-let [auth-code (get-in request [:params :code])]
   (let [client-id (get-env :client-id)
         client-secret (get-env :client-secret)
         callback-uri (str (base-url) "/callback")
         oauth-token-path (str (auth-url) "/api/token")
-        auth-code (get-in request [:params :code])
         token-response (http/post oauth-token-path {:form-params {:grant_type    "authorization_code"
                                                                   :redirect_uri  callback-uri
                                                                   :code          auth-code
@@ -80,7 +80,8 @@
                        (json/parse-string keyword))]
     (-> (r/redirect (absolute-path :voting))
         (assoc :session {:access-token (:access_token token-body)
-                         :user (:user-email token-body)}))))
+                         :user (:user-email token-body)})))
+    (r/redirect (absolute-path :home))))
 
 (defn voting [request]
   (if (logged-in? request)
