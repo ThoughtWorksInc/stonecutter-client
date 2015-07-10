@@ -7,7 +7,7 @@
   (let [user-email (get-in request [:session :user])]
     (html/at enlive-m
              [:.clj-user] (html/content user-email)
-             [:.clj-logout] (html/html-content "<a href=/logout>logout</a>"))))
+             [:.clj-logout] (html/html-content "<a href=/logout class=func--logout__link>logout</a>"))))
 
 (defn voting-page [request]
   (->> (vh/load-template "public/poll.html")
