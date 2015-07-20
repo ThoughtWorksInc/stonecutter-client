@@ -5,4 +5,3 @@ CLIENT_SECRET=TESTCLIENTPARTYAPPSECRET123 \
 BASE_URL=http://localhost:4000 \
 AUTH_URL=http://localhost:3000 \
 lein ring server
-
