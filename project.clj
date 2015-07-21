@@ -14,6 +14,7 @@
                  [clj-http "1.1.2"]
                  [environ "1.0.0"]
                  [org.clojure/tools.logging "0.3.1"]
+                 [org.clojars.d-cent/stonecutter-oauth "0.1.0-SNAPSHOT"]
                  [clj-logging-config "1.9.12"]]
   :main stonecutter-client.handler
   :aot :all
