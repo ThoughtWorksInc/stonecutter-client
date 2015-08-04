@@ -66,7 +66,8 @@
     (let [token (client/request-access-token! stonecutter-config auth-code)]
       (-> (r/redirect (absolute-path :voting))
           (assoc :session {:access-token (:access_token token)
-                           :user (:user-email token)})))
+                           :user (:user-email token)
+                           :user-email-confirmed (:user-email-confirmed token)})))
     (r/redirect (absolute-path :home))))
 
 (defn voting [request]

@@ -4,9 +4,10 @@
 
 
 (defn set-user-name [request enlive-m]
-  (let [user-email (get-in request [:session :user])]
+  (let [user-email (get-in request [:session :user])
+        confirmed (get-in request [:session :user-email-confirmed])]
     (html/at enlive-m
-             [:.clj-user] (html/content user-email)
+             [:.clj-user] (html/content (str user-email " " (if confirmed ":)" ":(")))
              [:.clj-logout] (html/html-content "<a href=/logout class=func--logout__link>logout</a>"))))
 
 (defn voting-page [request]
