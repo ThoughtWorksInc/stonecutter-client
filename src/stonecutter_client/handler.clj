@@ -67,7 +67,8 @@
       (-> (r/redirect (absolute-path :voting))
           (assoc :session {:access-token (:access_token token)
                            :user (:user-email token)
-                           :user-email-confirmed (:user-email-confirmed token)})))
+                           :user-email-confirmed (:user-email-confirmed token)
+                           :role (:role token)})))
     (r/redirect (absolute-path :home))))
 
 (defn voting [request]
