@@ -63,12 +63,13 @@
 
 (defn oauth-callback [request]
   (if-let [auth-code (get-in request [:params :code])]
-    (let [token (client/request-access-token! stonecutter-config auth-code)]
+    (let [token (client/request-access-token! stonecutter-config auth-code)
+          user-info (:user-info token)]
       (-> (r/redirect (absolute-path :voting))
           (assoc :session {:access-token (:access_token token)
-                           :user (:user-email token)
-                           :user-email-confirmed (:user-email-confirmed token)
-                           :role (:role token)})))
+                           :user (:email user-info)
+                           :user-email-confirmed (:email_verified user-info)
+                           :role (:role user-info)})))
     (r/redirect (absolute-path :home))))
 
 (defn voting [request]
