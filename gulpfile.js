@@ -9,8 +9,8 @@ var gulp = require('gulp'),
     imagemin = require('gulp-imagemin'),
     del = require('del'),
     runSequence = require('run-sequence'),
-    nodemon = require('gulp-nodemon'),
-    ghPages = require('gulp-gh-pages')
+    nodemon = '',
+    ghPages = '',
     browsersync = '';
 
 var isDev = false;
@@ -135,9 +135,12 @@ gulp.task('clj', function () {
 gulp.task('server', function (callback) {
   isDev = true;
   browsersync = require('browser-sync');
+  nodemon = require('gulp-nodemon');
+  ghPages = require('gulp-gh-pages');
+
   runSequence('clean-build',
-      ['sass', 'js', 'images', 'favicons', 'fonts', 'browser-sync', 'watch'],
-      callback);
+  ['sass', 'js', 'images', 'favicons', 'fonts', 'browser-sync', 'watch'],
+  callback);
 });
 
 gulp.task('build', function (callback) {
