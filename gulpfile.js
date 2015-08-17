@@ -7,13 +7,14 @@ var gulp = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     minifyCSS = require('gulp-minify-css'),
     imagemin = require('gulp-imagemin'),
-    browsersync = require('browser-sync'),
     del = require('del'),
     runSequence = require('run-sequence'),
     nodemon = require('gulp-nodemon'),
-    ghPages = require('gulp-gh-pages');
+    ghPages = require('gulp-gh-pages')
+    browsersync = '';
 
 var isDev = false;
+
 var output_path = 'resources/public';
 var deployed_path = 'deployed';
 var dev_path = {
@@ -51,8 +52,7 @@ gulp.task('jade', function () {
         console.log(err);
         this.emit('end');
       })
-      .pipe(gulp.dest(build_path.html))
-      .pipe(browsersync.stream());
+      .pipe(gulp.dest(build_path.html));
 });
 
 gulp.task('sass', function () {
@@ -64,8 +64,7 @@ gulp.task('sass', function () {
       })
       .pipe(autoprefixer())
       .pipe(gulpif(!isDev, minifyCSS({noAdvanced: true}))) // minify if Prod
-      .pipe(gulp.dest(build_path.css))
-      .pipe(browsersync.stream());
+      .pipe(gulp.dest(build_path.css));
 });
 
 gulp.task('js', function () {
@@ -74,22 +73,19 @@ gulp.task('js', function () {
         console.log(err);
         this.emit('end');
       })
-      .pipe(gulp.dest(build_path.js))
-      .pipe(browsersync.stream());
+      .pipe(gulp.dest(build_path.js));
 });
 
 gulp.task('images', function () {
   return gulp.src(dev_path.images)
       .pipe(imagemin({progressive: true}))
-      .pipe(gulp.dest(build_path.images))
-      .pipe(browsersync.stream());
+      .pipe(gulp.dest(build_path.images));
 });
 
 gulp.task('favicons', function () {
   return gulp.src(dev_path.favicons)
       .pipe(imagemin({progressive: true}))
-      .pipe(gulp.dest(build_path.html))
-      .pipe(browsersync.stream());
+      .pipe(gulp.dest(build_path.html));
 });
 
 gulp.task('fonts', function () {
@@ -103,6 +99,11 @@ gulp.task('browser-sync', ['nodemon'], function () {
     port: dev_path.port,  // use *different* port than above
     notify: true,
     open: true,
+    files: [build_path.images,
+            dev_path.jade,
+            dev_path.favicons,
+            dev_path.js,
+            build_path.css],
     ui: {
       port: 7272
     }
@@ -133,6 +134,7 @@ gulp.task('clj', function () {
 
 gulp.task('server', function (callback) {
   isDev = true;
+  browsersync = require('browser-sync');
   runSequence('clean-build',
       ['sass', 'js', 'images', 'favicons', 'fonts', 'browser-sync', 'watch'],
       callback);
