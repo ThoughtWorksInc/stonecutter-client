@@ -3,8 +3,9 @@
             [stonecutter-client.view.view-helpers :as vh]))
 
 (defn result-page [request]
-  (->> (vh/load-template "public/view-poll.html")
-        html/emit*
-       (apply str)))
+  (apply str  
+         (-> (vh/load-template "public/view-poll.html")
+             html/emit*
+             vh/set-static-paths)))
 
 

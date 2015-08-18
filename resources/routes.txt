@@ -1,7 +1,8 @@
-GET     /             home
-GET     /voting       voting
-GET     /login        show-login-form
-POST    /login        login
-GET     /logout       logout
-GET     /callback     oauth-callback
-GET     /view-poll    show-poll-result
+GET     /                       home
+GET     /:protocol/             home-with-protocol
+GET     /:protocol/voting       voting
+GET     /:protocol/login        show-login-form
+POST    /:protocol/login        login
+GET     /:protocol/logout       logout
+GET     /:protocol/callback     oauth-callback
+GET     /view-poll              show-poll-result

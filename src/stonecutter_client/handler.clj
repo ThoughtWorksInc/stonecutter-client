@@ -29,8 +29,8 @@
 
 (defn auth-url [] (get-env :auth-url "http://localhost:3000"))
 
-(defn absolute-path [resource]
-  (str (base-url) (path resource)))
+(defn absolute-path [resource & params]
+  (str (base-url) (apply path resource params)))
 
 (defn html-response [s]
   (-> s
@@ -42,40 +42,50 @@
        (get-in request [:session :access-token])))
 
 (defn home [request]
-  (r/redirect (absolute-path :login)))
+  (let [protocol (get-in request [:route-params :protocol] "oauth")]
+    (r/redirect (absolute-path :login :protocol protocol))))
 
 (defn show-login-form [request]
-  (if (logged-in? request)
-    (r/redirect (absolute-path :voting))
-    (html-response (login/login-page request))))
+  (let [protocol (get-in request [:route-params :protocol])]
+    (if (logged-in? request)
+      (r/redirect (absolute-path :voting :protocol protocol))
+      (html-response (login/login-page request protocol)))))
 
-(def stonecutter-config (client/configure (auth-url)
-                                          (get-env :client-id)
-                                          (get-env :client-secret)
-                                          (str (base-url) "/callback")))
+(def stonecutter-config-m {"oauth" (client/configure (auth-url)
+                                                     (get-env :client-id)
+                                                     (get-env :client-secret)
+                                                     (str (base-url) "/oauth/callback"))
+                           "openid" (client/configure (auth-url)
+                                                      (get-env :client-id)
+                                                      (get-env :client-secret)
+                                                      (str (base-url) "/openid/callback"))})
 
 (defn login [request]
-  (client/authorisation-redirect-response stonecutter-config))
+  (let [protocol (get-in request [:route-params :protocol])]
+    (client/authorisation-redirect-response (get stonecutter-config-m protocol))))
 
 (defn logout [request]
-  (-> (r/redirect (absolute-path :home))
-      (assoc :session nil)))
+  (let [protocol (get-in request [:route-params :protocol])]
+    (-> (r/redirect (absolute-path :home-with-protocol :protocol protocol))
+        (assoc :session nil))))
 
 (defn oauth-callback [request]
-  (if-let [auth-code (get-in request [:params :code])]
-    (let [token (client/request-access-token! stonecutter-config auth-code)
-          user-info (:user-info token)]
-      (-> (r/redirect (absolute-path :voting))
-          (assoc :session {:access-token (:access_token token)
-                           :user (:email user-info)
-                           :user-email-confirmed (:email_verified user-info)
-                           :role (:role user-info)})))
-    (r/redirect (absolute-path :home))))
+  (let [protocol (get-in request [:route-params :protocol])] 
+    (if-let [auth-code (get-in request [:params :code])]
+      (let [token (client/request-access-token! (get stonecutter-config-m protocol) auth-code)
+            user-info (:user-info token)]
+        (-> (r/redirect (absolute-path :voting :protocol protocol))
+            (assoc :session {:access-token (:access_token token)
+                             :user (:email user-info)
+                             :user-email-confirmed (:email_verified user-info)
+                             :role (:role user-info)})))
+      (r/redirect (absolute-path :home)))))
 
 (defn voting [request]
-  (if (logged-in? request)
-    (html-response (voting/voting-page request))
-    (r/redirect (absolute-path :login))))
+  (let [protocol (get-in request [:route-params :protocol])] 
+    (if (logged-in? request)
+      (html-response (voting/voting-page request))
+      (r/redirect (absolute-path :login :protocol protocol)))))
 
 (defn show-poll-result [request]
   (html-response (view-poll/result-page request)))
@@ -85,6 +95,7 @@
 
 (def handlers
   {:home                 home
+   :home-with-protocol   home
    :show-login-form      show-login-form
    :login                login
    :logout               logout

@@ -10,7 +10,7 @@ block content
       h1.poll__question_intro Soho requires safer cycle lanes?
       h2.poll__queston Do you agree?
       .poll___answers
-        form(action='/login', method='post')
+        form.clj--login_form(action='/login', method='post')
           button.button(type='submit')
             span.poll-box__answer-button(href="#{oAuthURL}/sign-in") Sign in to vote
 
