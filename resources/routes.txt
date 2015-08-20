@@ -4,5 +4,6 @@ GET     /:protocol/voting       voting
 GET     /:protocol/login        show-login-form
 POST    /:protocol/login        login
 GET     /:protocol/logout       logout
-GET     /:protocol/callback     oauth-callback
+GET     /oauth/callback         oauth-callback
+GET     /openid/callback        openid-callback
 GET     /view-poll              show-poll-result

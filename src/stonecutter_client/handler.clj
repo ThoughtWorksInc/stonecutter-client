@@ -35,6 +35,17 @@
 (defn absolute-path [resource & params]
   (str (base-url) (apply path resource params)))
 
+(def stonecutter-config-m {"oauth" (client/configure (auth-url)
+                                                     (get-env :client-id)
+                                                     (get-env :client-secret)
+                                                     (str (base-url) "/oauth/callback"))
+                           "openid" (client/configure (auth-url)
+                                                      (get-env :client-id)
+                                                      (get-env :client-secret)
+                                                      (str (base-url) "/openid/callback")
+                                                      :protocol :openid
+                                                      :public-key (public-key))})
+
 (defn html-response [s]
   (-> s
       r/response
@@ -54,17 +65,6 @@
       (r/redirect (absolute-path :voting :protocol protocol))
       (html-response (login/login-page request protocol)))))
 
-(def stonecutter-config-m {"oauth" (client/configure (auth-url)
-                                                     (get-env :client-id)
-                                                     (get-env :client-secret)
-                                                     (str (base-url) "/oauth/callback"))
-                           "openid" (client/configure (auth-url)
-                                                      (get-env :client-id)
-                                                      (get-env :client-secret)
-                                                      (str (base-url) "/openid/callback")
-                                                      :protocol :openid
-                                                      :public-key (public-key))})
-
 (defn login [request]
   (let [protocol (get-in request [:route-params :protocol])]
     (client/authorisation-redirect-response (get stonecutter-config-m protocol))))
@@ -74,22 +74,31 @@
     (-> (r/redirect (absolute-path :home-with-protocol :protocol protocol))
         (assoc :session nil))))
 
+(defn logged-in-redirect [protocol access-token user-info] 
+  (-> (r/redirect (absolute-path :voting :protocol protocol))
+      (assoc :session {:access-token access-token 
+                       :user (:email user-info)
+                       :user-email-confirmed (:email_verified user-info)
+                       :role (:role user-info)}))) 
+
 (defn oauth-callback [request]
-  (let [protocol (get-in request [:route-params :protocol])
+  (let [protocol "oauth" 
         stonecutter-config (get stonecutter-config-m protocol)] 
     (if-let [auth-code (get-in request [:params :code])]
       (let [token-response (client/request-access-token! stonecutter-config auth-code)
-            user-info (if (= protocol "openid")
-                        (jwt/decode (:public-key stonecutter-config)
-                                    (:client-id stonecutter-config)
-                                    (:auth-provider-url stonecutter-config)
-                                    (:id_token token-response))
-                        (:user-info token-response))]
-        (-> (r/redirect (absolute-path :voting :protocol protocol))
-            (assoc :session {:access-token (:access_token token-response)
-                             :user (:email user-info)
-                             :user-email-confirmed (:email_verified user-info)
-                             :role (:role user-info)})))
+            access-token (:access_token token-response)
+            user-info (:user-info token-response)]
+        (logged-in-redirect protocol access-token user-info))
+      (r/redirect (absolute-path :home)))))
+
+(defn openid-callback [request]
+  (let [protocol "openid" 
+        stonecutter-config (get stonecutter-config-m protocol)] 
+    (if-let [auth-code (get-in request [:params :code])]
+      (let [token-response (client/request-access-token! stonecutter-config auth-code)
+            access-token (:access_token token-response)
+            user-info (jwt/decode stonecutter-config (:id_token token-response))]
+        (logged-in-redirect protocol access-token user-info))
       (r/redirect (absolute-path :home)))))
 
 (defn voting [request]
@@ -111,6 +120,7 @@
    :login                login
    :logout               logout
    :oauth-callback       oauth-callback
+   :openid-callback      openid-callback
    :voting               voting
    :show-poll-result     show-poll-result})
 
