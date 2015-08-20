@@ -7,6 +7,7 @@
             [scenic.routes :refer [scenic-handler]]
             [clojure.tools.logging :as log]
             [stonecutter-oauth.client :as client]
+            [stonecutter-oauth.jwt :as jwt]
             [stonecutter-client.logging :as log-config]
             [stonecutter-client.routes :refer [routes path]]
             [stonecutter-client.view.login :as login]
@@ -26,8 +27,10 @@
        default))))
 
 (defn base-url [] (get-env :base-url "http://localhost:4000"))
-
 (defn auth-url [] (get-env :auth-url "http://localhost:3000"))
+
+(defn default-json-web-key-string [] (slurp "./resources/test-key.json"))
+(defn public-key [] (jwt/json->key-pair (get-env :json-web-key (default-json-web-key-string))))
 
 (defn absolute-path [resource & params]
   (str (base-url) (apply path resource params)))
@@ -58,7 +61,9 @@
                            "openid" (client/configure (auth-url)
                                                       (get-env :client-id)
                                                       (get-env :client-secret)
-                                                      (str (base-url) "/openid/callback"))})
+                                                      (str (base-url) "/openid/callback")
+                                                      :protocol :openid
+                                                      :public-key (public-key))})
 
 (defn login [request]
   (let [protocol (get-in request [:route-params :protocol])]
@@ -70,12 +75,18 @@
         (assoc :session nil))))
 
 (defn oauth-callback [request]
-  (let [protocol (get-in request [:route-params :protocol])] 
+  (let [protocol (get-in request [:route-params :protocol])
+        stonecutter-config (get stonecutter-config-m protocol)] 
     (if-let [auth-code (get-in request [:params :code])]
-      (let [token (client/request-access-token! (get stonecutter-config-m protocol) auth-code)
-            user-info (:user-info token)]
+      (let [token-response (client/request-access-token! stonecutter-config auth-code)
+            user-info (if (= protocol "openid")
+                        (jwt/decode (:public-key stonecutter-config)
+                                    (:client-id stonecutter-config)
+                                    (:auth-provider-url stonecutter-config)
+                                    (:id_token token-response))
+                        (:user-info token-response))]
         (-> (r/redirect (absolute-path :voting :protocol protocol))
-            (assoc :session {:access-token (:access_token token)
+            (assoc :session {:access-token (:access_token token-response)
                              :user (:email user-info)
                              :user-email-confirmed (:email_verified user-info)
                              :role (:role user-info)})))
