@@ -96,7 +96,8 @@
     (if-let [auth-code (get-in request [:params :code])]
       (let [token-response (client/request-access-token! stonecutter-config auth-code)
             access-token (:access_token token-response)
-            user-info (jwt/decode stonecutter-config (:id_token token-response))]
+            public-key (public-key)
+            user-info (jwt/decode (assoc stonecutter-config :public-key public-key) (:id_token token-response))]
         (logged-in-redirect protocol access-token user-info))
       (r/redirect (absolute-path :home)))))
 
