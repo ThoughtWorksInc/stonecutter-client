@@ -12,6 +12,7 @@
                  [hiccup "1.0.5"]
                  [clj-yaml "0.4.0"]
                  [clj-http "1.1.2"]
+                 [cheshire "5.5.0"]
                  [environ "1.0.0"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojars.d-cent/stonecutter-oauth "0.1.7-SNAPSHOT"]

@@ -6,6 +6,8 @@
             [environ.core :refer [env]]
             [scenic.routes :refer [scenic-handler]]
             [clojure.tools.logging :as log]
+            [clj-http.client :as http]
+            [cheshire.core :as json]
             [stonecutter-oauth.client :as client]
             [stonecutter-oauth.jwt :as jwt]
             [stonecutter-client.logging :as log-config]
@@ -29,8 +31,16 @@
 (defn base-url [] (get-env :base-url "http://localhost:4000"))
 (defn auth-url [] (get-env :auth-url "http://localhost:3000"))
 
+(defn get-stonecutter-public-key []
+  (-> (http/get "https://sso-staging.dcentproject.eu/api/jwk-set" {:accept :json})
+      :body
+      json/parse-string
+      (get "keys")
+      first
+      json/generate-string))
+
 (defn default-json-web-key-string [] (slurp "./resources/test-key.json"))
-(defn public-key [] (jwt/json->key-pair (get-env :json-web-key (default-json-web-key-string))))
+(defn public-key [] (jwt/json->key-pair (get-stonecutter-public-key)))
 
 (defn absolute-path [resource & params]
   (str (base-url) (apply path resource params)))
