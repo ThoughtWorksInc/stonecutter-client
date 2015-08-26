@@ -43,8 +43,7 @@
                                                       (get-env :client-id)
                                                       (get-env :client-secret)
                                                       (str (base-url) "/openid/callback")
-                                                      :protocol :openid
-                                                      :public-key (public-key))})
+                                                      :protocol :openid)})
 
 (defn html-response [s]
   (-> s
