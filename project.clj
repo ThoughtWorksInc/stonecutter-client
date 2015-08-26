@@ -15,7 +15,7 @@
                  [cheshire "5.5.0"]
                  [environ "1.0.0"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [org.clojars.d-cent/stonecutter-oauth "0.1.7-SNAPSHOT"]
+                 [org.clojars.d-cent/stonecutter-oauth "0.1.8-SNAPSHOT"]
                  [clj-logging-config "1.9.12"]]
   :main stonecutter-client.handler
   :aot :all

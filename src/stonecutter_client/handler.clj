@@ -31,16 +31,15 @@
 (defn base-url [] (get-env :base-url "http://localhost:4000"))
 (defn auth-url [] (get-env :auth-url "http://localhost:3000"))
 
-(defn get-stonecutter-public-key []
-  (-> (http/get "https://sso-staging.dcentproject.eu/api/jwk-set" {:accept :json})
+(defn get-stonecutter-public-key [jwks-url]
+  (-> (http/get jwks-url {:accept :json})
       :body
       json/parse-string
       (get "keys")
       first
       json/generate-string))
 
-(defn default-json-web-key-string [] (slurp "./resources/test-key.json"))
-(defn public-key [] (jwt/json->key-pair (get-stonecutter-public-key)))
+(defn get-stonecutter-jwt-key-pair [] (jwt/json->key-pair (get-stonecutter-public-key "https://sso-staging.dcentproject.eu/api/jwk-set")))
 
 (defn absolute-path [resource & params]
   (str (base-url) (apply path resource params)))
@@ -106,7 +105,7 @@
     (if-let [auth-code (get-in request [:params :code])]
       (let [token-response (client/request-access-token! stonecutter-config auth-code)
             access-token (:access_token token-response)
-            public-key (public-key)
+            public-key (get-stonecutter-jwt-key-pair)
             user-info (jwt/decode (assoc stonecutter-config :public-key public-key) (:id_token token-response))]
         (logged-in-redirect protocol access-token user-info))
       (r/redirect (absolute-path :home)))))
