@@ -1,6 +1,6 @@
 #!/bin/bash
 
-result=$(lein ancient :allow-snapshots | grep sxtonecutter-oauth)
+result=$(lein ancient :allow-snapshots | grep stonecutter-oauth)
 
 if [ -n "$result" ]; then
     exit 1
