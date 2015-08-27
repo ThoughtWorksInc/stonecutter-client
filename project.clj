@@ -15,7 +15,7 @@
                  [cheshire "5.5.0"]
                  [environ "1.0.0"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [org.clojars.d-cent/stonecutter-oauth "0.1.9-SNAPSHOT"]
+                 [org.clojars.d-cent/stonecutter-oauth "0.1.8-SNAPSHOT"]
                  [clj-logging-config "1.9.12"]]
   :main stonecutter-client.handler
   :aot :all
@@ -24,7 +24,8 @@
                                     [prone "0.8.2"]
                                     [kerodon "0.6.1"]]
                    :plugins        [[lein-ring "0.9.6"]
-                                    [lein-midje "3.1.3"]]
+                                    [lein-midje "3.1.3"]
+                                    [lein-ancient "0.6.7"]]
                    :ring {:handler stonecutter-client.handler/app
                           :init stonecutter-client.handler/lein-ring-init
                           :port 4000
