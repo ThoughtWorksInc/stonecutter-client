@@ -32,13 +32,6 @@
 (defn auth-url [] (get-env :auth-url "http://localhost:3000"))
 (defn auth-jwks-url [] (get-env :auth-jwks-url (str (auth-url) "/api/jwk-set")))
 
-(defn get-public-key [jwks-url]
-  (-> (http/get jwks-url {:accept :json :as :json})
-      :body
-      :keys
-      first
-      json/generate-string))
-
 (defn absolute-path [resource & params]
   (str (base-url) (apply path resource params)))
 
@@ -103,8 +96,8 @@
     (if-let [auth-code (get-in request [:params :code])]
       (let [token-response (client/request-access-token! stonecutter-config auth-code)
             access-token (:access_token token-response)
-            public-key (jwt/json->key-pair (get-public-key (auth-jwks-url)))
-            user-info (jwt/decode stonecutter-config (:id_token token-response) public-key)]
+            public-key-string (jwt/get-public-key-string-from-jwk-set-url (auth-jwks-url))
+            user-info (jwt/decode stonecutter-config (:id_token token-response) public-key-string)]
         (logged-in-redirect protocol access-token user-info))
       (r/redirect (absolute-path :home)))))
 
